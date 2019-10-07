@@ -8,46 +8,36 @@ function printReceipt(inputs){
     let receiptText = '***<store earning no money>Receipt ***\n';
     var name = '';
     var unit = '';
-    var singlePrice = '';
+    var singlePrice = 0;
     var price = 0;
-    var unitCount = 0;
+    var quantity = 0;
     var counter = 1;
     var total = 0;
     
     
    inputs.forEach(item => {
        if(counter === 1){
-           name = item.Name;
-           unit = item.Unit;
-           price = item.Price;
-           singlePrice = item.Price;
-           unitCount++;
+            setItemInfos(item);
+            quantity++;
        }else if (name === item.Name){
             price = price + item.Price;
-            unitCount++;
+            quantity++;
        }else if(name !== item.Name && counter < inputs.length){
-           if(unitCount > 1){
-            unit = unit + 's';
-           }
-            receiptText = receiptText + 'Name: ' + name + ', Quantity: ' + unitCount + ' ' + unit + ', Unit price: ' + singlePrice.toFixed(2) + ' (yuan), Subtotal: ' + price.toFixed(2) + ' (yuan)\n';
-            name = item.Name;
-            unit = item.Unit;
-            price = item.Price;
-            singlePrice = item.Price;
-            unitCount = 1;
+            unit = setUnitName(quantity, unit)
+            receiptText += createReceipt(name, quantity, unit, singlePrice, price);
+            setItemInfos(item);
+            quantity = 1;
        }
        if (counter === inputs.length){
-        if(unitCount > 1){
-         unit = unit + 's';
-        }
-            receiptText = receiptText + 'Name: ' + name + ', Quantity: ' + unitCount + ' ' + unit + ', Unit price: ' + singlePrice.toFixed(2) + ' (yuan), Subtotal: ' + price.toFixed(2) + ' (yuan)\n';
-            name = item.Name;
-            unit = item.Unit;
-            price = item.Price;
-            singlePrice = item.Price;
-            unitCount = 1;
+            unit = setUnitName(quantity, unit)
+            receiptText += createReceipt(name, quantity, unit, singlePrice, price);
+            setItemInfos(item);
+
+            quantity = 1;
             total = total + singlePrice;
-            receiptText = receiptText + 'Name: ' + name + ', Quantity: ' + unitCount + ', Unit price: ' + singlePrice.toFixed(2) + ' (yuan), Subtotal: ' + price.toFixed(2) + ' (yuan)\n';
+            unit = setUnitName(quantity, unit)
+            receiptText += createReceipt(name, quantity, unit, singlePrice, price);
+            
             receiptText = receiptText + '----------------------\n' + 
                 'Total: ' + total.toFixed(2) + ' (yuan)\n' + 
                 '**********************\n';
@@ -56,5 +46,26 @@ function printReceipt(inputs){
         counter++;
    });
 
+   function setItemInfos(item){
+    name = item.Name;
+    unit = item.Unit;
+    price = item.Price;
+    singlePrice = item.Price;
+   };
+
    return receiptText;
 };
+
+   function setUnitName(quantity, unit){
+    var unitName = '';
+    if(unit === 'a'){
+        return '';
+    }
+    if(quantity > 1){
+        return ' ' + unit + 's';
+    }
+   };
+
+   function createReceipt(name, quantity, unit, singlePrice, price){
+        return 'Name: ' + name + ', Quantity: ' + quantity + '' + unit + ', Unit price: ' + singlePrice.toFixed(2) + ' (yuan), Subtotal: ' + price.toFixed(2) + ' (yuan)\n';
+   };
